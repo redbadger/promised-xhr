@@ -88,6 +88,21 @@ var sendRequest = function (options) {
   }
 
   return new Promise(function (resolve, reject){
+    function setResponseObject (response, callback) {
+      response.status = client.status;
+      response.headers = parseHeaders(client.getAllResponseHeaders().split('\n'));
+      response.body = client.responseText;
+
+      callback(response);
+    }
+
+    if (window.XMLHttpRequest) {
+      client.timeout = options.timeout || 1500;
+      client.ontimeout = function() {
+        setResponseObject(new Error('The server encountered an error with a status code ' + client.status), reject);
+      };
+    }
+
     client.onreadystatechange = function () {
       if (client.readyState !== 4) return;
 
@@ -95,14 +110,6 @@ var sendRequest = function (options) {
         setResponseObject({}, resolve);
       } else {
         setResponseObject(new Error('The server encountered an error with a status code ' + client.status), reject);
-      }
-
-      function setResponseObject (response, callback) {
-        response.status = client.status;
-        response.headers = parseHeaders(client.getAllResponseHeaders().split('\n'));
-        response.body = client.responseText;
-
-        callback(response);
       }
     };
 
