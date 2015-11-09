@@ -97,9 +97,9 @@ var sendRequest = function (options) {
     }
 
     if (window.XMLHttpRequest) {
-      client.timeout = options.timeout || 15000;
+      client.timeout = options.timeout || 0;
       client.ontimeout = function() {
-        setResponseObject(new Error('The server encountered an error with a status code ' + client.status), reject);
+        setResponseObject(new Error('The server encountered an error with status code ' + client.status), reject);
       };
     }
 
